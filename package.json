@@ -1,20 +1,16 @@
 {
   "name": "popcorn-gateway",
   "version": "6.0.0",
-  "description": "Gateway server for Popcorn GPS Collar",
+  "description": "Popcorn GPS Collar Gateway",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "node src/index.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.2"
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1"
   },
   "engines": {
     "node": ">=18.0.0"
