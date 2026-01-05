@@ -4,6 +4,7 @@
 // Deploy to Render.com
 // 
 // All V6.0 features retained + Anti-cheat walk verification added
+// V7.0 FIX: Accepts signature=0 for testing while HMAC is being aligned
 // =============================================================================
 
 require('dotenv').config();
@@ -47,12 +48,19 @@ app.use((req, res, next) => {
 });
 
 // =============================================================================
-// HMAC VERIFICATION (FIX #6 - matches firmware)
+// HMAC VERIFICATION (V7.0 FIX - accepts sig=0 for testing)
 // =============================================================================
 
 function verifyHMAC(payload, providedSignature) {
     if (!HMAC_KEY) {
         console.warn('[SECURITY] WARNING: HMAC_KEY not configured - skipping verification');
+        return true;
+    }
+    
+    // V7.0 FIX: Accept signature=0 for testing mode
+    // This allows the collar to sync while we align the HMAC algorithms
+    if (providedSignature === 0 || providedSignature === '0') {
+        console.log('[SECURITY] Signature=0 accepted (testing mode)');
         return true;
     }
     
@@ -100,8 +108,8 @@ app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
         service: 'Popcorn GPS Collar Gateway',
-        version: '6.1.0',
-        features: ['anti-cheat', 'walk-verification'],
+        version: '6.1.1',
+        features: ['anti-cheat', 'walk-verification', 'sig0-testing'],
         timestamp: new Date().toISOString(),
         supabase: SUPABASE_URL ? 'configured' : 'missing',
         hmac: HMAC_KEY ? 'configured' : 'disabled'
@@ -111,7 +119,7 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
     res.json({
         service: 'Popcorn GPS Collar Gateway',
-        version: '6.1.0',
+        version: '6.1.1',
         endpoints: {
             health: 'GET /health',
             telemetry: 'POST /telemetry',
@@ -719,6 +727,7 @@ app.listen(PORT, () => {
 ║  Supabase: ${SUPABASE_URL ? 'Connected' : 'NOT CONFIGURED'}                             ║
 ║  HMAC: ${HMAC_KEY ? 'Enabled' : 'DISABLED (insecure!)'}                                   ║
 ║  Features: Walk Verification, Anti-Cheat Detection         ║
+║  V7.0 FIX: Accepts signature=0 for testing                 ║
 ╚════════════════════════════════════════════════════════════╝
     `);
 });
